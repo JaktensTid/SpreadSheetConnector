@@ -7,3 +7,35 @@
 \\csfs\home$\bruev_i_a\profile\my documents\visual studio 2010\Projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\SpreadSheetConnector.pdb
 \\csfs\home$\bruev_i_a\profile\my documents\visual studio 2010\Projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.exe
 \\csfs\home$\bruev_i_a\profile\my documents\visual studio 2010\Projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.exe
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\SpreadSheetConnector.exe.config
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\SpreadSheetConnector.exe
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\SpreadSheetConnector.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.Form1.resources
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.Properties.Resources.resources
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.csproj.GenerateResource.Cache
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.PlatformServices.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Core.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.PlatformServices.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Sheets.v4.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Newtonsoft.Json.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Zlib.Portable.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.PlatformServices.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Auth.PlatformServices.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Core.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Core.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.PlatformServices.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.PlatformServices.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Sheets.v4.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Google.Apis.Sheets.v4.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Newtonsoft.Json.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Zlib.Portable.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.AddForm.resources
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.csprojResolveAssemblyReference.cache
