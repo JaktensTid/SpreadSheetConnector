@@ -38,4 +38,8 @@ E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetCo
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Newtonsoft.Json.xml
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Zlib.Portable.xml
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.AddForm.resources
-E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.csprojResolveAssemblyReference.cache
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\CsvHelper.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Excel.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\CsvHelper.xml
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Excel.pdb

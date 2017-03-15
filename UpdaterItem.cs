@@ -6,36 +6,56 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Excel;
-using System.Data.OleDb;
+using System.Threading.Tasks;
+using CsvHelper;
+using System.Windows.Forms;
 
 namespace SpreadSheetConnector
 {
     public class DataReader
     {
-        public static DataSet Read(string path)
+        public static DataTable Read(string path)
         {
-            DataSet result;
             using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
             {
                 IExcelDataReader excelReader = GetReader(path, stream);
                 if (excelReader != null)
                 {
-                    result = excelReader.AsDataSet();
-                    return result;
+                    DataSet set = excelReader.AsDataSet();
+                    if (set.Tables.Count > 0)
+                    {
+                        return set.Tables[0];
+                    }
+                }
+                using (TextReader reader = new StreamReader(stream))
+                {
+                    DataTable dt = new DataTable();
+                    var csv = new CsvReader(reader);
+                    csv.ReadHeader();
+                    DataColumn[] columns = new DataColumn[csv.FieldHeaders.Length];
+                    for (int i = 0; i < csv.FieldHeaders.Length; i++)
+                    {
+                        columns[i] = new DataColumn(csv.FieldHeaders[i]);
+                    }
+                    dt.Columns.AddRange(columns);
+                    DataRow headerRow = dt.NewRow();
+                    for (int i = 0; i < columns.Length; i++)
+                    {
+                        headerRow[columns[i]] = columns[i];
+                    }
+                    while (csv.Read())
+                    {
+                        var row = dt.NewRow();
+                        foreach (DataColumn column in dt.Columns)
+                        {
+                            row[column.ColumnName] = csv.GetField(column.DataType, column.ColumnName);
+                        }
+                        dt.Rows.Add(row);
+                    }
+                    return dt;
                 }
             }
-            using (OleDbConnection conn = new OleDbConnection("Provider=Microsoft.Jet.OleDb.4.0; Data Source = " +
-                  Path.GetDirectoryName(path) + "; Extended Properties = \"Text;HDR=YES;FMT=Delimited\""))
-            {
-                conn.Open();
 
-                OleDbDataAdapter adapter = new OleDbDataAdapter
-                       ("SELECT * FROM " + Path.GetFileName(path), conn);
-
-                result = new DataSet("Temp");
-                adapter.Fill(result);
-                return result;
-            }
         }
 
         private static IExcelDataReader GetReader(string path, Stream stream)
@@ -120,13 +140,12 @@ namespace SpreadSheetConnector
             watchdog.EnableRaisingEvents = true;
         }
 
-        private void watchdog_Changed(object sender, FileSystemEventArgs e)
+        private async void watchdog_Changed(object sender, FileSystemEventArgs e)
         {
             date = DateTime.Now;
-            DataSet set = DataReader.Read(e.FullPath);
-            if (set.Tables.Count > 0)
+            DataTable table = DataReader.Read(e.FullPath);
+            if (table != null)
             {
-                DataTable table = set.Tables[0];
                 if (range != null)
                 {
                     if (table.Rows.Count > range.Item2)
@@ -134,18 +153,35 @@ namespace SpreadSheetConnector
                         foreach (var i in Enumerable.Range(range.Item1, range.Item2))
                         {
                             table.Rows[i].Delete();
-                            set.AcceptChanges();
                         }
                     }
                 }
 
-                if (action == UpdaterAction.Append)
+                try
                 {
-                    connector.Append(table);
+                    if (action == UpdaterAction.Append)
+                    {
+                        await connector.Append(table, GoogleSpreadsheetID);
+                    }
+                    if (action == UpdaterAction.Overwrite)
+                    {
+                        await connector.Overwrite(table, GoogleSpreadsheetID);
+                    }
                 }
-                if (action == UpdaterAction.Overwrite)
+                catch (AggregateException ae)
                 {
-                    connector.Overwrite(table);
+                    ae.Handle((x) =>
+                    {
+                        if (x is IOException)
+                        {
+                            MessageBox.Show("Please, close " + e.FullPath);
+                        }
+                        if (x is Google.GoogleApiException)
+                        {
+                            MessageBox.Show("Spreadsheets", "Max cells number is 2000000");
+                        }
+                        return false;
+                    });
                 }
             }
         }

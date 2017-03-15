@@ -6,6 +6,7 @@ using System.IO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using CsvHelper;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Data;
@@ -18,24 +19,19 @@ namespace SpreadSheetConnector
         private static string[] Scopes = { SheetsService.Scope.Spreadsheets };
         private static string CredsPath;
         public bool Authorized { get; set; }
-
-        public GoogleConnector(string clientCredsPath)
+        public Task Connect(string clientCredsPath)
         {
-            CredsPath = clientCredsPath;
-        }
-
-        public Task Connect()
-        {
-            return new Task(() =>
+            return Task.Factory.StartNew(() =>
             {
                 try
                 {
+                    CredsPath = clientCredsPath;
                     UserCredential credential;
 
                     using (var stream =
                         new FileStream(CredsPath, FileMode.Open, FileAccess.Read))
                     {
-                        string credPath = "/";
+                        string credPath = new FileInfo(CredsPath).DirectoryName;
 
                         credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                             GoogleClientSecrets.Load(stream).Secrets,
@@ -59,21 +55,40 @@ namespace SpreadSheetConnector
             });
         }
 
-        public void Append(DataTable table, string spreadsheetID)
+        public async Task<int?> Append(DataTable table, string spreadsheetID)
         {
-            IList<IList<object>> matrix = new List<List<object>>();
-            foreach(var row in table.Rows)
+            ValueRange valueRange = new ValueRange();
+            valueRange.Values = new List<IList<object>>();
+            for (int i = 0; i < table.Rows.Count; i++)
             {
-                List<object> list = new List<object>();
-
-                matrix.Add(new List<object>())
+                valueRange.Values.Add(new List<object>(table.Rows[i].ItemArray));
             }
-            service.Spreadsheets.Values.Append(new ValueRange().
+            SpreadsheetsResource.ValuesResource.GetRequest getRequest =
+                new SpreadsheetsResource.ValuesResource.GetRequest(service, spreadsheetID, "A:A");
+            ValueRange response = getRequest.Execute();
+            int responseRowsLength = 1;
+            if (response.Values != null)
+            {
+               responseRowsLength = response.Values.Count;
+            }
+            SpreadsheetsResource.ValuesResource.AppendRequest appendRequest =
+                new SpreadsheetsResource.ValuesResource.AppendRequest(
+                    service,
+                    valueRange,
+                    spreadsheetID,
+                    "A1:A" + responseRowsLength);
+            appendRequest.ValueInputOption =
+                SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            return (await appendRequest.ExecuteAsync()).Updates.UpdatedRows;
         }
 
-        public void Overwrite(DataTable table, string spreadsheetID)
+        public async Task<int?> Overwrite(DataTable table, string spreadsheetID)
         {
-
+            BatchUpdateValuesRequest values = new BatchUpdateValuesRequest();
+            SpreadsheetsResource.ValuesResource.BatchUpdateRequest clearRequest =
+                new SpreadsheetsResource.ValuesResource.BatchUpdateRequest(service, values, spreadsheetID);
+            await clearRequest.ExecuteAsync();
+            return await Append(table, spreadsheetID);
         }
     }
 }

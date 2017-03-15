@@ -51,8 +51,8 @@ namespace SpreadSheetConnector
                 string sFileName = choofdlog.FileName;
                 if(choofdlog.FileNames.Length > 0)
                 {
-                    googleConnector = new GoogleConnector(choofdlog.FileNames[0]);
-                    await googleConnector.Connect();
+                    googleConnector = new GoogleConnector();
+                    await googleConnector.Connect(choofdlog.FileNames[0]);
                     if(googleConnector.Authorized)
                     {
                         ConnectionSuccessLabel.ForeColor = Color.Green;
