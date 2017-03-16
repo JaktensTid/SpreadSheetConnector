@@ -43,3 +43,4 @@ E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetCo
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\ICSharpCode.SharpZipLib.dll
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\CsvHelper.xml
 E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\bin\Debug\Excel.pdb
+E:\Program Files (x86)\Visual Studio projects\SpreadSheetConnector\SpreadSheetConnector\obj\x86\Debug\SpreadSheetConnector.csprojResolveAssemblyReference.cache

@@ -224,7 +224,9 @@ namespace SpreadSheetConnector
 
             if (Directory.Exists(SaveFolder))
             {
-                foreach (FileInfo file in Directory.EnumerateFiles(UpdaterItem.SaveFolder).Select(path => new FileInfo(path)))
+                foreach (FileInfo file in Directory.EnumerateFiles(UpdaterItem.SaveFolder)
+                    .Select(path => new FileInfo(path))
+                    .Where(file => file.Extension == ".dat"))
                 {
                     using (Stream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.ReadWrite))
                     {

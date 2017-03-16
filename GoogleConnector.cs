@@ -82,12 +82,16 @@ namespace SpreadSheetConnector
             return (await appendRequest.ExecuteAsync()).Updates.UpdatedRows;
         }
 
+        public void ClearSpreadsheet(string spreadsheetID)
+        {
+            service.Spreadsheets.Values.Clear(new ClearValuesRequest(),
+                spreadsheetID,
+                "Sheet1").Execute();
+        }
+
         public async Task<int?> Overwrite(DataTable table, string spreadsheetID)
         {
-            BatchUpdateValuesRequest values = new BatchUpdateValuesRequest();
-            SpreadsheetsResource.ValuesResource.BatchUpdateRequest clearRequest =
-                new SpreadsheetsResource.ValuesResource.BatchUpdateRequest(service, values, spreadsheetID);
-            await clearRequest.ExecuteAsync();
+            ClearSpreadsheet(spreadsheetID);
             return await Append(table, spreadsheetID);
         }
     }
