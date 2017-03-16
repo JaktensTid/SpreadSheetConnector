@@ -12,12 +12,13 @@ namespace SpreadSheetConnector
 {
     public partial class Form1 : Form
     {
-        public List<UpdaterItem> items = UpdaterItem.DeserializeUpdaterItems();
+        public BindingList<UpdaterItem> items = UpdaterItem.DeserializeUpdaterItems();
         private GoogleConnector googleConnector;
         public Form1()
         {
             InitializeComponent();
             DataGridView.DataSource = items;
+            
         }
 
         private void AddNewButton_Click(object sender, EventArgs e)
@@ -30,13 +31,21 @@ namespace SpreadSheetConnector
         {
             items.Add(item);
             UpdaterItem.SerializeUpdaterItems(items);
+            if (googleConnector != null && googleConnector.Authorized)
+            {
+                item.StartWatch();
+            }
+            DataGridView.DataSource = null;
             DataGridView.DataSource = items;
         }
         private void RemoveSelectedButton_Click(object sender, EventArgs e)
         {
-            int selectedIndex = DataGridView.CurrentCell.RowIndex;
-            items[selectedIndex].Dispose();
-            items.RemoveAt(selectedIndex);
+            foreach (DataGridViewRow item in this.DataGridView.SelectedRows)
+            {
+                items[item.Index].Dispose();
+                DataGridView.Rows.RemoveAt(item.Index);
+            }
+            DataGridView.DataSource = null;
             DataGridView.DataSource = items;
         }
 
@@ -49,20 +58,25 @@ namespace SpreadSheetConnector
             if (choofdlog.ShowDialog() == DialogResult.OK)
             {
                 string sFileName = choofdlog.FileName;
-                if(choofdlog.FileNames.Length > 0)
+                if (choofdlog.FileNames.Length > 0)
                 {
                     googleConnector = new GoogleConnector();
                     await googleConnector.Connect(choofdlog.FileNames[0]);
-                    if(googleConnector.Authorized)
+                    if (googleConnector.Authorized)
                     {
+                        UpdaterItem.connector = googleConnector;
                         ConnectionSuccessLabel.ForeColor = Color.Green;
                         ConnectionSuccessLabel.Text = "Connected";
+                        foreach(var item in items)
+                        {
+                            item.StartWatch();
+                        }
                     }
                     else
                     {
                         MessageBox.Show("Something went wrong.");
                     }
-                }           
+                }
             }
         }
 

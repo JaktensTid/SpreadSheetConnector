@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Data;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Excel;
-using System.Threading.Tasks;
 using CsvHelper;
 using System.Windows.Forms;
 
@@ -27,35 +26,38 @@ namespace SpreadSheetConnector
                         return set.Tables[0];
                     }
                 }
-                using (TextReader reader = new StreamReader(stream))
+                else
                 {
-                    DataTable dt = new DataTable();
-                    var csv = new CsvReader(reader);
-                    csv.ReadHeader();
-                    DataColumn[] columns = new DataColumn[csv.FieldHeaders.Length];
-                    for (int i = 0; i < csv.FieldHeaders.Length; i++)
+                    using (TextReader reader = new StreamReader(stream))
                     {
-                        columns[i] = new DataColumn(csv.FieldHeaders[i]);
-                    }
-                    dt.Columns.AddRange(columns);
-                    DataRow headerRow = dt.NewRow();
-                    for (int i = 0; i < columns.Length; i++)
-                    {
-                        headerRow[columns[i]] = columns[i];
-                    }
-                    while (csv.Read())
-                    {
-                        var row = dt.NewRow();
-                        foreach (DataColumn column in dt.Columns)
+                        DataTable dt = new DataTable();
+                        var csv = new CsvReader(reader);
+                        csv.ReadHeader();
+                        DataColumn[] columns = new DataColumn[csv.FieldHeaders.Length];
+                        for (int i = 0; i < csv.FieldHeaders.Length; i++)
                         {
-                            row[column.ColumnName] = csv.GetField(column.DataType, column.ColumnName);
+                            columns[i] = new DataColumn(csv.FieldHeaders[i]);
                         }
-                        dt.Rows.Add(row);
+                        dt.Columns.AddRange(columns);
+                        DataRow headerRow = dt.NewRow();
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            headerRow[columns[i]] = columns[i];
+                        }
+                        while (csv.Read())
+                        {
+                            var row = dt.NewRow();
+                            foreach (DataColumn column in dt.Columns)
+                            {
+                                row[column.ColumnName] = csv.GetField(column.DataType, column.ColumnName);
+                            }
+                            dt.Rows.Add(row);
+                        }
+                        return dt;
                     }
-                    return dt;
                 }
             }
-
+            return new DataTable();
         }
 
         private static IExcelDataReader GetReader(string path, Stream stream)
@@ -97,10 +99,13 @@ namespace SpreadSheetConnector
         {
             get
             {
-                if (googlePath.Split('=').Length > 0)
-                    return googlePath.Split('=').Last();
-                else
-                    return null;
+                if (googlePath.Contains("/d/"))
+                {
+                    int pFrom = googlePath.IndexOf("/d/") + "/d/".Length;
+                    int pTo = googlePath.LastIndexOf("/");
+                    return googlePath.Substring(pFrom, pTo - pFrom);
+                }
+                return "";
             }
         }
         public UpdaterAction Action => action;
@@ -117,7 +122,7 @@ namespace SpreadSheetConnector
             if (!Directory.Exists(SaveFolder))
                 Directory.CreateDirectory(SaveFolder);
             if (!Directory.Exists(localPath))
-                throw new FileNotFoundException("File not exists", localPath);
+                throw new FileNotFoundException("Directory not exists", localPath);
             if (googlePath.Split('=').Length == 0)
                 throw new ArgumentException("Google path not exists", googlePath);
 
@@ -133,56 +138,55 @@ namespace SpreadSheetConnector
             watchdog = new FileSystemWatcher()
             {
                 Path = localPath,
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
-                Filter = "*.csv|*.xls|*.xlsx"
+                NotifyFilter = NotifyFilters.LastWrite,
+                Filter = "*.*"
             };
-            watchdog.Changed += new FileSystemEventHandler(watchdog_Changed);
+            watchdog.Changed += new FileSystemEventHandler(Changed);
             watchdog.EnableRaisingEvents = true;
         }
 
-        private async void watchdog_Changed(object sender, FileSystemEventArgs e)
+        private async void Changed(object sender, FileSystemEventArgs e)
         {
-            date = DateTime.Now;
-            DataTable table = DataReader.Read(e.FullPath);
-            if (table != null)
+            try
             {
-                if (range != null)
-                {
-                    if (table.Rows.Count > range.Item2)
-                    {
-                        foreach (var i in Enumerable.Range(range.Item1, range.Item2))
-                        {
-                            table.Rows[i].Delete();
-                        }
-                    }
-                }
+                var ext = new FileInfo(e.FullPath).Extension;
 
-                try
+                if (ext != ".csv" & 
+                    ext != ".xls" & 
+                    ext != ".xlsx") return;
+                watchdog.EnableRaisingEvents = false;
+                date = DateTime.Now;
+                DataTable table = DataReader.Read(e.FullPath);
+                if (table != null)
                 {
+                    int deleteRowsRange = 0;
+                    if(range != null)
+                    {
+                        deleteRowsRange = range.Item2;
+                    }
+
+                    
                     if (action == UpdaterAction.Append)
                     {
-                        await connector.Append(table, GoogleSpreadsheetID);
+                        await connector.Append(table, GoogleSpreadsheetID, deleteRowsRange);
                     }
                     if (action == UpdaterAction.Overwrite)
                     {
-                        await connector.Overwrite(table, GoogleSpreadsheetID);
+                        await connector.Overwrite(table, GoogleSpreadsheetID, deleteRowsRange);
                     }
                 }
-                catch (AggregateException ae)
-                {
-                    ae.Handle((x) =>
-                    {
-                        if (x is IOException)
-                        {
-                            MessageBox.Show("Please, close " + e.FullPath);
-                        }
-                        if (x is Google.GoogleApiException)
-                        {
-                            MessageBox.Show("Spreadsheets", "Max cells number is 2000000");
-                        }
-                        return false;
-                    });
-                }
+            }
+            catch (IOException)
+            {
+                
+            }
+            catch (Google.GoogleApiException exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+            finally
+            {
+                watchdog.EnableRaisingEvents = true;
             }
         }
 
@@ -200,7 +204,7 @@ namespace SpreadSheetConnector
             return localPath.GetHashCode() + googlePath.GetHashCode();
         }
 
-        public static void SerializeUpdaterItems(List<UpdaterItem> items)
+        public static void SerializeUpdaterItems(BindingList<UpdaterItem> items)
         {
             IFormatter formatter = new BinaryFormatter();
             foreach (UpdaterItem item in items)
@@ -217,9 +221,9 @@ namespace SpreadSheetConnector
             }
         }
 
-        public static List<UpdaterItem> DeserializeUpdaterItems()
+        public static BindingList<UpdaterItem> DeserializeUpdaterItems()
         {
-            List<UpdaterItem> items = new List<UpdaterItem>();
+            BindingList<UpdaterItem> items = new BindingList<UpdaterItem>();
             IFormatter formatter = new BinaryFormatter();
 
             if (Directory.Exists(SaveFolder))

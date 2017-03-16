@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using CsvHelper;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Data;
@@ -55,11 +53,11 @@ namespace SpreadSheetConnector
             });
         }
 
-        public async Task<int?> Append(DataTable table, string spreadsheetID)
+        public async Task<int?> Append(DataTable table, string spreadsheetID, int deleteHeaders)
         {
             ValueRange valueRange = new ValueRange();
             valueRange.Values = new List<IList<object>>();
-            for (int i = 0; i < table.Rows.Count; i++)
+            for (int i = deleteHeaders; i < table.Rows.Count; i++)
             {
                 valueRange.Values.Add(new List<object>(table.Rows[i].ItemArray));
             }
@@ -76,7 +74,7 @@ namespace SpreadSheetConnector
                     service,
                     valueRange,
                     spreadsheetID,
-                    "A1:A" + responseRowsLength);
+                    string.Format("A{0}:A", responseRowsLength));
             appendRequest.ValueInputOption =
                 SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
             return (await appendRequest.ExecuteAsync()).Updates.UpdatedRows;
@@ -89,10 +87,10 @@ namespace SpreadSheetConnector
                 "Sheet1").Execute();
         }
 
-        public async Task<int?> Overwrite(DataTable table, string spreadsheetID)
+        public async Task<int?> Overwrite(DataTable table, string spreadsheetID, int deleteHeaders)
         {
             ClearSpreadsheet(spreadsheetID);
-            return await Append(table, spreadsheetID);
+            return await Append(table, spreadsheetID, deleteHeaders);
         }
     }
 }
